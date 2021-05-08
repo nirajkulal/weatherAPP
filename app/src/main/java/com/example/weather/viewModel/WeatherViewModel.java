@@ -62,10 +62,10 @@ public class WeatherViewModel extends ViewModel {
     public void setupJOB(MainActivity context) {
         if (!isWorkScheduled(TAG_SYNC_DATA, context)) {
             Constraints constraints = new Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .setRequiredNetworkType(NetworkType.UNMETERED)
                     .build();
             PeriodicWorkRequest periodicSyncDataWork =
-                    new PeriodicWorkRequest.Builder(Worker.class, 15, TimeUnit.MINUTES)
+                    new PeriodicWorkRequest.Builder(Worker.class, 2, TimeUnit.HOURS)
                             .addTag(TAG_SYNC_DATA)
                             .setBackoffCriteria(BackoffPolicy.LINEAR, 15, TimeUnit.SECONDS)
                             .setConstraints(constraints)

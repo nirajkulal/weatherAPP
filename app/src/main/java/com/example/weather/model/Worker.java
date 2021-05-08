@@ -44,11 +44,9 @@ public class Worker extends ListenableWorker {
                     @Override
                     public void onSuccess(Location location) {
                         if (location == null) {
-                            Log.v("WorkerLocation", "location retry");
                             completer.set(Result.retry());
                             return;
                         }
-                        Log.v("WorkerLocation", "location" + location.toString());
                         WeatherService weatherService = RetrofitClient
                                 .getRetrofitInstance()
                                 .create(WeatherService.class);
