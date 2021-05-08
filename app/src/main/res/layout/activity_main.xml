@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    tools:context=".view.MainActivity">
+
+    <ImageView
+        android:id="@+id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/banner_height"
+        android:scaleType="centerCrop"
+        android:src="@drawable/banner" />
+
+
+    <androidx.cardview.widget.CardView
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/banner"
+        android:layout_margin="10dp"
+        app:cardCornerRadius="5dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/card_color"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/loc"
+                android:layout_width="@dimen/marker_image"
+                android:layout_height="@dimen/marker_image"
+                android:src="@drawable/marker"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/loc_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/loc"
+                android:text="Fetching.."
+                android:textColor="@color/white"
+                android:textSize="@dimen/medium" />
+
+            <TextView
+                android:id="@+id/last_updated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/loc"
+                android:layout_marginBottom="20dp"
+                android:text=""
+                android:textColor="@color/white"
+                android:textSize="@dimen/small" />
+
+            <TextView
+                android:id="@+id/current"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/last_updated"
+                android:text="30"
+                android:textColor="@color/white"
+                android:textSize="@dimen/large" />
+
+            <ImageView
+
+                android:id="@+id/status_icon"
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size"
+                android:layout_below="@+id/last_updated"
+                android:layout_toEndOf="@id/current"
+                android:src="@drawable/marker"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/sunrise"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/current"
+                android:layout_marginTop="10dp"
+                android:text="sunrise"
+                android:textColor="@color/white"
+                android:textSize="@dimen/small" />
+
+
+            <TextView
+                android:id="@+id/sunset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/sunrise"
+                android:textColor="@color/white"
+                android:textSize="@dimen/small" />
+
+            <TextView
+                android:id="@+id/type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/last_updated"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="10dp"
+                android:text=""
+                android:textColor="@color/white"
+                android:textSize="@dimen/small" />
+
+
+            <TextView
+                android:id="@+id/min_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/type"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="5dp"
+                android:text=""
+                android:textColor="@color/white"
+                android:textSize="@dimen/normal" />
+
+            <TextView
+                android:id="@+id/feels_like"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/min_max"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/small" />
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

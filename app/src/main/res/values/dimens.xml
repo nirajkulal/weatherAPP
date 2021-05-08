@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="normal">18sp</dimen>
+    <dimen name="medium">24sp</dimen>
+    <dimen name="small">14sp</dimen>
+    <dimen name="large">45sp</dimen>
+    <dimen name="banner_height">300dp</dimen>
+    <dimen name="marker_image">30dp</dimen>
+    <dimen name="icon_size">60dp</dimen>
+</resources>

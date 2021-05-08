@@ -1,0 +1,74 @@
+package com.example.weather.model.localDatabase.realm.models;
+
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+public class Sys extends RealmObject {
+    public void setPrimaryID(int primaryID) {
+        this.primaryID = primaryID;
+    }
+
+    @PrimaryKey
+    private int primaryID;
+
+    private Integer type;
+
+    private Integer id;
+
+    private Double message;
+
+    private String country;
+
+    private Integer sunrise;
+
+    private Integer sunset;
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Double getMessage() {
+        return message;
+    }
+
+    public void setMessage(Double message) {
+        this.message = message;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public Integer getSunrise() {
+        return sunrise;
+    }
+
+    public void setSunrise(Integer sunrise) {
+        this.sunrise = sunrise;
+    }
+
+    public Integer getSunset() {
+        return sunset;
+    }
+
+    public void setSunset(Integer sunset) {
+        this.sunset = sunset;
+    }
+
+}
