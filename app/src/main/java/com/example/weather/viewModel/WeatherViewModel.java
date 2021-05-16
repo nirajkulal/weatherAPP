@@ -1,6 +1,7 @@
 package com.example.weather.viewModel;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
@@ -12,6 +13,8 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
+import com.example.weather.R;
+import com.example.weather.databinding.ActivityMainBinding;
 import com.example.weather.model.Worker;
 import com.example.weather.model.localDatabase.data.ViewData;
 import com.example.weather.model.localDatabase.DatabaseFunctions;
@@ -31,6 +34,7 @@ public class WeatherViewModel extends ViewModel {
 
     /**
      * Check Job is scheduled
+     *
      * @param tag
      * @param context
      * @return
@@ -57,6 +61,7 @@ public class WeatherViewModel extends ViewModel {
 
     /**
      * Setup a job if not scheduled
+     *
      * @param context
      */
     public void setupJOB(MainActivity context) {
@@ -87,10 +92,39 @@ public class WeatherViewModel extends ViewModel {
 
     /**
      * Get data from local database.
+     *
      * @return
      */
     public ViewData getData() {
         DatabaseFunctions localDatabaseHandler = LocalDatabaseFactory.getDatabase();
         return localDatabaseHandler.fetch();
+    }
+
+    /**
+     * Get the error message
+     * @param context
+     * @return
+     */
+    public String getPermissionError(Context context) {
+        return context.getString(R.string.permisson_text);
+    }
+
+    /**
+     * Get the status message
+     * @param context
+     * @return
+     */
+    public String getRunningMessage(Context context) {
+        return context.getString(R.string.fetch_text);
+    }
+
+    /**
+     * Check error message displayed
+     * @param context
+     * @param binding
+     * @return
+     */
+    public boolean isErrorDisplayed(Context context, ActivityMainBinding binding) {
+        return binding.locText.getText().toString().equals(getPermissionError(context));
     }
 }

@@ -41,7 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/loc"
-                android:text="Fetching.."
+                android:text="@string/fetching"
                 android:textColor="@color/white"
                 android:textSize="@dimen/medium" />
 
@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/current"
                 android:layout_marginTop="10dp"
-                android:text="sunrise"
+                android:text="@string/sunrise"
                 android:textColor="@color/white"
                 android:textSize="@dimen/small" />
 

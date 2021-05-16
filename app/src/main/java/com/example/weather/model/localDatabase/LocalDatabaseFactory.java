@@ -6,5 +6,4 @@ public class LocalDatabaseFactory {
     public static DatabaseFunctions getDatabase() {
         return new RealDatabase();
     }
-
 }

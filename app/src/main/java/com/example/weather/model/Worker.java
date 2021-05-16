@@ -1,11 +1,11 @@
 package com.example.weather.model;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.location.Location;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.work.ListenableWorker;
 import androidx.work.WorkerParameters;
@@ -17,8 +17,10 @@ import com.example.weather.model.network.RetrofitClient;
 import com.example.weather.model.network.WeatherService;
 import com.example.weather.model.network.networkModels.WeatherModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import retrofit2.Call;
@@ -31,46 +33,69 @@ public class Worker extends ListenableWorker {
         super(context, workerParams);
     }
 
-
     @NonNull
     @Override
     public ListenableFuture<Result> startWork() {
-        return CallbackToFutureAdapter.getFuture(new CallbackToFutureAdapter.Resolver<Result>() {
-            @Nullable
-            @Override
-            public Object attachCompleter(@NonNull CallbackToFutureAdapter.Completer<Result> completer) throws Exception {
-                FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
-                OnSuccessListener<Location> onSuccessListener = new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location == null) {
-                            completer.set(Result.retry());
-                            return;
-                        }
-                        WeatherService weatherService = RetrofitClient
-                                .getRetrofitInstance()
-                                .create(WeatherService.class);
-                        Call<WeatherModel> call = weatherService.getWeather(location.getLatitude() + "",
-                                location.getLongitude() + "",
-                                BuildConfig.ID);
-                        call.enqueue(new Callback<WeatherModel>() {
-                            @Override
-                            public void onResponse(Call<WeatherModel> call, Response<WeatherModel> response) {
-                                DatabaseFunctions localDatabaseHandler = LocalDatabaseFactory.getDatabase();
-                                localDatabaseHandler.storeData(response.body());
-                                completer.set(Result.success());
-                            }
+        return CallbackToFutureAdapter.getFuture(this::getCurrentLocation);
+    }
 
-                            @Override
-                            public void onFailure(Call<WeatherModel> call, Throwable t) {
-                                completer.set(Result.failure());
-                            }
-                        });
-                    }
-                };
-                fusedLocationClient.getLastLocation().addOnSuccessListener(onSuccessListener);
-                return onSuccessListener;
+    LocationCallback locationCallback;
+
+    private LocationCallback getCurrentLocation(CallbackToFutureAdapter.Completer<Result> completer) {
+        FusedLocationProviderClient fusedLocationClient = LocationServices
+                .getFusedLocationProviderClient(getApplicationContext());
+        LocationRequest locationRequest = getLocReq();
+        locationCallback
+                = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResultOut) {
+                if (locationResultOut == null) {
+                    return;
+
+                }
+                //only first value considered.
+                fusedLocationClient.removeLocationUpdates(this);
+                handleLocation(locationResultOut, completer);
+            }
+        };
+        fusedLocationClient.requestLocationUpdates(locationRequest,
+                locationCallback,
+                Looper.getMainLooper());
+        return locationCallback;
+    }
+
+    private LocationRequest getLocReq() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(1000);
+        locationRequest.setFastestInterval(100);
+        locationRequest.setSmallestDisplacement(0.01f);
+        return locationRequest;
+    }
+
+    private void handleLocation(LocationResult locationResultOut, CallbackToFutureAdapter.Completer<Result> completer) {
+        WeatherService weatherService = RetrofitClient
+                .getRetrofitInstance()
+                .create(WeatherService.class);
+        Call<WeatherModel> call = weatherService.getWeather(locationResultOut.getLastLocation().getLatitude() + "",
+                locationResultOut.getLastLocation().getLongitude() + "",
+                BuildConfig.ID);
+        call.enqueue(new Callback<WeatherModel>() {
+            @Override
+            public void onResponse(Call<WeatherModel> call, Response<WeatherModel> response) {
+                handleLocalDB(response, completer);
+            }
+
+            @Override
+            public void onFailure(Call<WeatherModel> call, Throwable t) {
+                completer.set(Result.failure());
             }
         });
     }
+
+    private void handleLocalDB(Response<WeatherModel> response, CallbackToFutureAdapter.Completer<Result> completer) {
+        DatabaseFunctions localDatabaseHandler = LocalDatabaseFactory.getDatabase();
+        localDatabaseHandler.storeData(response.body());
+        completer.set(Result.success());
+    }
+
 }

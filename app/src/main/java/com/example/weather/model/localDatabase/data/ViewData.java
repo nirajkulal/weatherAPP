@@ -88,5 +88,4 @@ public class ViewData {
 
     String sunSet;
 
-
 }

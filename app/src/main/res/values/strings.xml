@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Weather</string>
+    <string name="alert_title">GPS is not enabled!!</string>
+    <string name="alert_desc">Your GPS seems to be disabled, do you want to enable it?</string>
+    <string name="permisson_text">Permission Needed</string>
+    <string name="fetch_text">Fetching data</string>
+    <string name="fetching">Fetching..</string>
+    <string name="sunrise">sunrise</string>
 </resources>

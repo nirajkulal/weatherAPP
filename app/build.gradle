@@ -17,6 +17,7 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -28,12 +29,16 @@ android {
             buildConfigField('String', "ID", apikeyProperties['ID'])
             buildConfigField('String', "URL", apikeyProperties['URL'])
         }
-        debug{
+        debug {
             buildConfigField('String', "ID", apikeyProperties['ID'])
             buildConfigField('String', "URL", apikeyProperties['URL'])
         }
 
     }
+    useLibrary 'android.test.runner'
+    useLibrary 'android.test.base'
+    useLibrary 'android.test.mock'
+
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -43,6 +48,15 @@ android {
     buildFeatures {
         viewBinding true
     }
+    testOptions {
+        unitTests.includeAndroidResources = true
+        unitTests.returnDefaultValues = true
+        unitTests.all {
+            systemProperty 'robolectric.dependency.repo.url', 'https://repo1.maven.org/maven2'
+        }
+
+    }
+
 }
 
 dependencies {
@@ -64,6 +78,7 @@ dependencies {
 
     // (Java only)
     implementation "androidx.work:work-runtime:$work_version"
+    implementation "androidx.work:work-testing:$work_version"
 
     implementation "androidx.work:work-rxjava2:$work_version"
 
@@ -75,5 +90,22 @@ dependencies {
     implementation "androidx.concurrent:concurrent-futures:1.1.0"
 
     implementation 'com.github.bumptech.glide:glide:4.12.0'
+
+
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.7.2")
+    testImplementation "org.mockito:mockito-core:3.3.3"
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test:core:1.3.0'
+    // Core library
+    androidTestImplementation 'androidx.test:core:1.3.0'
+    testImplementation 'androidx.test:core:1.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+
+
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    testImplementation 'androidx.test.ext:junit:1.1.2'
+    testImplementation 'org.robolectric:robolectric:4.3'
+
 
 }

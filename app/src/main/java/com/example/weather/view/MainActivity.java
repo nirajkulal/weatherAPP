@@ -12,8 +12,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.weather.R;
 import com.example.weather.databinding.ActivityMainBinding;
 import com.example.weather.model.localDatabase.data.ViewData;
 import com.example.weather.utils.UIHelper;
@@ -22,10 +26,12 @@ import com.example.weather.viewModel.WeatherViewModel;
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
-    int requestCode = 123;
-
+    int requestCodeLoc = 123;
     WeatherViewModel viewModel;
 
+    /**
+     * Activity life cycle callback
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,8 +51,20 @@ public class MainActivity extends AppCompatActivity {
             WorkInfo workInfo = listOfWorkInfo.get(0);
             if (workInfo.getState() == WorkInfo.State.ENQUEUED) {
                 updateUI();
+            } else if (workInfo.getState() == WorkInfo.State.RUNNING) {
+                updateUIRunning();
             }
         });
+    }
+
+    /**
+     * Update Job status - Tqast message
+     */
+    private void updateUIRunning() {
+        Toast.makeText(this,
+                viewModel.getRunningMessage(this),
+                Toast.LENGTH_SHORT)
+                .show();
     }
 
     /**
@@ -56,6 +74,31 @@ public class MainActivity extends AppCompatActivity {
         if (UIHelper.isEnabled(MainActivity.this)) {
             viewModel.setupJOB(MainActivity.this);
             observe();
+            handleErrorMessage();
+            handleDialog();
+        } else {
+            updateUIPermmisonError();
+        }
+    }
+
+    /**
+     * Hanlde alert window
+     */
+    private void handleDialog() {
+        if (alertDialog != null) {
+            if (alertDialog.isShowing()) {
+                if (!isFinishing())
+                    alertDialog.cancel();
+            }
+        }
+    }
+
+    /**
+     * Handle error message
+     */
+    private void handleErrorMessage() {
+        if (viewModel.isErrorDisplayed(this, binding)) {
+            binding.locText.setText(viewModel.getRunningMessage(this));
         }
     }
 
@@ -66,7 +109,8 @@ public class MainActivity extends AppCompatActivity {
         ViewData viewData = viewModel.getData();
         if (viewData != null) {
             binding.current.setText(viewData.getCurrentTemp());
-            binding.locText.setText(viewData.getLocation());
+            if (viewData.getLocation() != null)
+                binding.locText.setText(viewData.getLocation());
             binding.feelsLike.setText(viewData.getFeelsLike());
             binding.type.setText(viewData.getStatus());
             binding.sunrise.setText(viewData.getSunRise());
@@ -82,12 +126,21 @@ public class MainActivity extends AppCompatActivity {
      */
     private void checkPermission() {
         if (UIHelper.isLocationPermission(MainActivity.this)) {
+            updateUIPermmisonError();
+
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    requestCode);
+                    requestCodeLoc);
         } else {
             requestLocation();
         }
+    }
+
+    /**
+     * Update error message
+     */
+    private void updateUIPermmisonError() {
+        binding.locText.setText(viewModel.getPermissionError(this));
     }
 
     /**
@@ -97,8 +150,12 @@ public class MainActivity extends AppCompatActivity {
         checkLocationenabled();
     }
 
+    /**
+     * Check permission
+     */
     public void checkLocationenabled() {
         if (!UIHelper.isLocationEnabled(MainActivity.this)) {
+            updateUIPermmisonError();
             buildAlertMessageNoGps();
         } else {
             setUp();
@@ -109,36 +166,48 @@ public class MainActivity extends AppCompatActivity {
      * Alert dialog is used to prompt request dialog for location enable
      */
     private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        dialog.cancel();
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        dialog.cancel();
+        handleDialog();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.alert_title)
+                .setCancelable(true)
+                .setMessage(R.string.alert_desc);
+        builder.setPositiveButton(
+                android.R.string.yes,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                     }
                 });
-        final AlertDialog alert = builder.create();
-        alert.show();
+        alertDialog = builder.create();
+        alertDialog.show();
+
     }
 
+    AlertDialog alertDialog;
+
+    /**
+     * Permisson callbacks
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == requestCode) {
+        if (requestCodeLoc == requestCode) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 requestLocation();
             }
         }
     }
 
+    /**
+     * Activity life cycle callback
+     */
     @Override
     protected void onResume() {
         super.onResume();
